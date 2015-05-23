@@ -68,7 +68,23 @@ var openNLP = function(config) {
 					return instance.chunk(javaSentence, tokensArray, cb);
 				}.bind(null, sentence));
 			}
-
+		},
+    doccat: {
+			categorize: function(sentence, cb) {
+				return self.doccat(function(sentence, error, instance) {
+					if (typeof sentence == 'string') {
+						var sentence = sentence.split(' ');
+					}
+					var javaSentence = self.java.newArray("java.lang.String", sentence);
+					return instance.categorize(javaSentence, cb);
+				}.bind(null, sentence));
+			},
+      getBestCategory: function(outcome, cb) {
+				return self.doccat(function(double, error, instance) {
+					var javaDouble = self.java.newArray("java.lang.double", outcome);
+					return instance.categorize(javaDouble, cb);
+				}.bind(null, outcome));
+			},
 		},
 		instance: self
 	}
@@ -151,6 +167,23 @@ openNLP.prototype.chunker = function(cb) {
 			}
 			return self.java.newInstance('opennlp.tools.chunker.ChunkerME', model, cb)
 		});
+	});
+}
+
+openNLP.prototype.doccat = function(cb) {
+	var self = this;
+	self.java.import('opennlp.tools.doccat.DoccatModel')
+	self.java.import('opennlp.tools.doccat.DocumentCategorizerME')
+	self.java.newInstance('java.io.FileInputStream', self.models.doccat, function(err, fis) {
+		if (err) {
+			return cb(err);
+		}
+		self.java.newInstance('opennlp.tools.doccat.DoccatModel', fis, function(err, model) {
+			if (err) {
+				return cb(err);
+			}
+			self.java.newInstance('opennlp.tools.doccat.DocumentCategorizerME', model, cb)
+		})
 	});
 }
 module.exports = openNLP;
