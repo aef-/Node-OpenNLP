@@ -71,18 +71,18 @@ var openNLP = function(config) {
 		},
     doccat: {
 			categorize: function(sentence, cb) {
-				return self.doccat(function(sentence, error, instance) {
+				return self.doccat(function(error, instance) {
 					if (typeof sentence == 'string') {
-						var sentence = sentence.split(' ');
+						sentence = sentence.split(' ');
 					}
 					var javaSentence = self.java.newArray("java.lang.String", sentence);
 					return instance.categorize(javaSentence, cb);
-				}.bind(null, sentence));
+				});
 			},
       getBestCategory: function(outcome, cb) {
 				return self.doccat(function(double, error, instance) {
-					var javaDouble = self.java.newArray("java.lang.double", outcome);
-					return instance.categorize(javaDouble, cb);
+					var javaDouble = self.java.newArray("double", outcome);
+					return instance.getBestCategory(javaDouble, cb);
 				}.bind(null, outcome));
 			},
 		},
